@@ -29,9 +29,10 @@ public sealed class HomeTileRegistrationService : IHostedService, IDisposable
     // Script IDs are stable within a UI generation, not forever. Injector and
     // Jellyfin Web can cache the previous script despite a DLL replacement.
     // A new ID lets this release load the updated home and menu integration.
-    private const string CurrentScriptId = "jellyfin-franchise-explorer-my-media-v08923-menu2";
+    private const string CurrentScriptId = "jellyfin-franchise-explorer-my-media-v08923-menu3";
     private static readonly string[] LegacyScriptIds =
     {
+        "jellyfin-franchise-explorer-my-media-v08923-menu2",
         "jellyfin-franchise-explorer-my-media-v08923",
         "jellyfin-franchise-explorer-my-media-v08922",
         "jellyfin-franchise-explorer-my-media-v08921",
@@ -66,7 +67,7 @@ public sealed class HomeTileRegistrationService : IHostedService, IDisposable
 
     public Task StartAsync(CancellationToken cancellationToken)
     {
-        _logger.LogInformation("Franchise Explorer test build menu2 loaded; registering script {ScriptId}.", CurrentScriptId);
+        _logger.LogInformation("Franchise Explorer test build menu3 loaded; registering script {ScriptId}.", CurrentScriptId);
         // Do not block Jellyfin startup if the optional companion is missing
         // or loads after this hosted service.
         _registrationTask = Task.Run(() => RegisterWithRetriesAsync(_stopping.Token), CancellationToken.None);

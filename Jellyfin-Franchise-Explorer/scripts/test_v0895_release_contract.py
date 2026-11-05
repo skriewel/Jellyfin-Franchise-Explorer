@@ -14,7 +14,7 @@ release = (repo / '.github/workflows/release.yml').read_text()
 
 for field in ('Version', 'AssemblyVersion', 'FileVersion'):
     assert f'<{field}>0.8.9.23</{field}>' in csproj
-assert 'CurrentScriptId = "jellyfin-franchise-explorer-my-media-v08923-menu2"' in service
+assert 'CurrentScriptId = "jellyfin-franchise-explorer-my-media-v08923-menu3"' in service
 assert '"jellyfin-franchise-explorer-my-media-v08922"' in service, 'Retire the previous plugin-owned Injector entry after registering this version'
 assert '"jellyfin-franchise-explorer-my-media-v08918"' in service, 'The previous v0.8.9.18 Injector entry must be retired after upgrade'
 assert '"jellyfin-franchise-explorer-my-media-v08917"' in service, 'The previous v0.8.9.17 Injector entry must be retired after upgrade'

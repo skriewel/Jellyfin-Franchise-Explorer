@@ -11,10 +11,10 @@ readme = (root.parent / "README.md").read_text(encoding="utf-8")
 
 for field in ("Version", "AssemblyVersion", "FileVersion"):
     assert f"<{field}>0.8.9.23</{field}>" in version, field
-assert 'CurrentScriptId = "jellyfin-franchise-explorer-my-media-v08923-menu2"' in cs
+assert 'CurrentScriptId = "jellyfin-franchise-explorer-my-media-v08923-menu3"' in cs
 assert '"jellyfin-franchise-explorer-my-media-v08923",' in cs
-assert 'Franchise Explorer test build menu2 loaded' in cs
-assert js.index('if (window.__franchiseExplorerMyMediaTileLoaded) return;') < js.index("window.__franchiseExplorerUiBuild = 'menu2'")
+assert 'Franchise Explorer test build menu3 loaded' in cs
+assert js.index('if (window.__franchiseExplorerMyMediaTileLoaded) return;') < js.index("window.__franchiseExplorerUiBuild = 'menu3'")
 assert '"jellyfin-franchise-explorer-my-media-v08914"' in cs
 assert '"jellyfin-franchise-explorer-my-media-v08913"' in cs
 assert '"jellyfin-franchise-explorer-my-media-v0899"' in cs
