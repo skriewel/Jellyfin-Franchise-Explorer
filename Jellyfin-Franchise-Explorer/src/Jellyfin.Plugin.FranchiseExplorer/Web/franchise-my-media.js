@@ -12,6 +12,10 @@
   window.__franchiseExplorerUiVersion = '0.8.9.23';
   if (window.__franchiseExplorerMyMediaTileLoaded) return;
   window.__franchiseExplorerMyMediaTileLoaded = true;
+  // Set only after the duplicate-injection guard: an older script running
+  // first must not be reported as this build.
+  window.__franchiseExplorerUiBuild = 'menu2';
+  console.info('[Franchise Explorer] UI build menu2 loaded');
   // Replaced with a data URI when registered by the plugin host service.
   const TILE_ART_DATA = '__FE_TILE_ART_DATA_URL__';
 
