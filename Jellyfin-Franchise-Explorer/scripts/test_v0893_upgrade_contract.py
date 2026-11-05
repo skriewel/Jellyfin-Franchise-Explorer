@@ -28,7 +28,8 @@ assert "CACHE_PREFIX = 'fe-franchise-home-v08923:'" in js
 assert 'confirmedEmpty = active.length === 0' in js
 assert 'Loading your franchise watch orders' in js
 assert 'Franchise Explorer Settings' in js
-assert 'Open Franchises' in js
+assert 'openBrowse' not in js
+assert 'actionSheetMenuItem' in js
 assert 'console.warn(' in js and 'error?.message' in js
 assert 'https://raw.githubusercontent.com/Gost1o1/Jellyfin-Franchise-Explorer/main/manifest.json' in readme
 assert 'https://raw.githubusercontent.com/n00bcodr/jellyfin-plugins/main/manifest.json' in readme

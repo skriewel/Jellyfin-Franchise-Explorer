@@ -17,7 +17,7 @@ assert "window.getComputedStyle(controlsHost).position === 'static'" in script
 assert script.index("syncNativeInlineStyles(tile, ref);") < script.index("window.getComputedStyle(controlsHost).position === 'static'")
 assert "if (!imageHost) controlsHost.style.pointerEvents = 'auto'" in script
 assert "bottom:3px" in script and "right:6px" in script
-assert "background:transparent;color:white" in script
+assert "paper-icon-button-light cardOverlayButton" in script
 assert "opacity:0;pointer-events:none;transition:opacity" in script
 assert ":hover .fe-settings-toggle" in script
 assert ":focus-within .fe-settings-toggle" in script

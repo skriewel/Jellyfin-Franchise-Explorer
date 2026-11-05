@@ -91,9 +91,6 @@
       #${TILE_ID}:hover .fe-settings-holder,
       #${TILE_ID}:focus-within .fe-settings-holder {pointer-events:auto!important;}
       #${TILE_ID} .fe-settings-toggle {
-        display:flex;align-items:center;justify-content:center;width:28px;height:28px;
-        border:0;border-radius:50%;background:transparent;color:white;cursor:pointer;
-        font:bold 20px/1 Arial,sans-serif;text-shadow:0 1px 4px #001b25;
         opacity:0;pointer-events:none;transition:opacity .15s ease;
       }
       #${TILE_ID}:hover .fe-settings-toggle,
@@ -103,20 +100,16 @@
         #${TILE_ID} .fe-settings-holder {pointer-events:auto!important;}
         #${TILE_ID} .fe-settings-toggle {opacity:1;pointer-events:auto;}
       }
-      #${TILE_ID} .fe-settings-toggle:hover,
-      #${TILE_ID} .fe-settings-toggle:focus-visible {background:#075a71;outline:2px solid #74dcec;}
-      #${TILE_ID} .fe-settings-menu {
-        position:absolute;right:0;bottom:33px;min-width:224px;max-width:min(85vw,280px);padding:5px;
-        background:#182430;color:#fff;border:1px solid #4b6878;border-radius:9px;
-        box-shadow:0 8px 24px #000a;box-sizing:border-box;
-      }
-      #${TILE_ID} .fe-settings-menu[hidden] {display:none!important;}
-      #${TILE_ID} .fe-settings-link {
-        display:block;padding:11px 10px;color:#fff;text-decoration:none;
-        font:600 13px/1.3 Arial,sans-serif;border-radius:6px;white-space:nowrap;
-      }
-      #${TILE_ID} .fe-settings-link:hover,
-      #${TILE_ID} .fe-settings-link:focus-visible {background:#244a5a;outline:1px solid #53c9df;}
+      /* ActionSheet's stylesheet is lazy-loaded in Jellyfin Web. Keep its
+         structural rules here so the first menu also works before any native
+         menu has been opened. Theme colors and button styles remain Jellyfin's. */
+      .fe-settings-menu {position:fixed;margin:0;padding:0;border:0;max-width:90vw;max-height:90vh;border-radius:.1em;color:inherit;font:inherit;}
+      .fe-settings-menu .actionSheetContent {display:flex;flex-direction:column;padding:.4em 0;}
+      .fe-settings-menu .actionSheetMenuItem {font-weight:inherit;box-shadow:none;border-radius:0;margin:0;}
+      .fe-settings-menu .actionsheetListItemBody {padding:.4em 1em .4em .6em;}
+      .fe-settings-menu .actionsheetMenuItemIcon {padding:0;margin:0 .85em 0 .45em;}
+      [dir="rtl"] .fe-settings-menu .actionsheetListItemBody {padding:.4em .6em .4em 1em;}
+      [dir="rtl"] .fe-settings-menu .actionsheetMenuItemIcon {margin:0 .45em 0 .85em;}
       #${TILE_ID}:focus-visible { outline:3px solid var(--theme-primary-color,#08bdd0);outline-offset:2px; }
       @media(max-width:540px){
         #${TILE_ID} .fe-tile-icon{font-size:36px}
@@ -289,15 +282,12 @@
     }
     tile.style.position='relative';
     const controls=document.createElement('div');controls.className='fe-settings-holder';
-    const trigger=document.createElement('button');trigger.type='button';trigger.className='fe-settings-toggle';
-    trigger.textContent='⋮';trigger.title='Franchises options';trigger.setAttribute('aria-label','Franchises options');
-    trigger.setAttribute('aria-haspopup','menu');trigger.setAttribute('aria-expanded','false');
-    const menu=document.createElement('div');menu.className='fe-settings-menu';menu.hidden=true;
-    menu.setAttribute('role','menu');
-    const openBrowse=document.createElement('a');openBrowse.className='fe-settings-link';openBrowse.href=browseUrl();
-    openBrowse.setAttribute('role','menuitem');openBrowse.textContent='▶  Open Franchises';
-    const settings=document.createElement('a');settings.className='fe-settings-link';settings.href=settingsUrl();
-    settings.setAttribute('role','menuitem');settings.textContent='⚙  Franchise Explorer Settings';
+    const trigger=document.createElement('button', {is:'paper-icon-button-light'});
+    trigger.type='button';trigger.setAttribute('is','paper-icon-button-light');
+    trigger.className='fe-settings-toggle paper-icon-button-light cardOverlayButton';
+    trigger.innerHTML='<span class="material-icons cardOverlayButtonIcon more_vert" aria-hidden="true"></span>';
+    trigger.title='Franchises options';trigger.setAttribute('aria-label','Franchises options');
+    trigger.setAttribute('aria-haspopup','dialog');trigger.setAttribute('aria-expanded','false');
     // The visible artwork ends ABOVE Jellyfin's separate card caption.
     // Positioning against the outer card put the three dots below the image,
     // so anchor the menu to the image itself, like Jellyfin's native tiles.
@@ -305,25 +295,59 @@
     // Do not inspect computed styles until the clone is connected to the
     // document: disconnected nodes can report wrong theme positions.
     if (!imageHost) controlsHost.style.pointerEvents = 'auto';
-    menu.append(openBrowse,settings);controls.append(trigger,menu);controlsHost.append(controls);
-    const setOpen=open=>{
-      if(open && activeSettingsMenu && activeSettingsMenu.controls!==controls)activeSettingsMenu.close();
-      menu.hidden=!open;trigger.setAttribute('aria-expanded',open?'true':'false');
-      if(open)activeSettingsMenu={controls,close:()=>setOpen(false)};
-      else if(activeSettingsMenu?.controls===controls)activeSettingsMenu=null;
+    controls.append(trigger);controlsHost.append(controls);
+    const openMenu=()=>{
+      if(activeSettingsMenu?.controls===controls){activeSettingsMenu.close();return;}
+      activeSettingsMenu?.close();
+      // Injected scripts cannot import Jellyfin's bundled actionSheet module.
+      // Use its DOM/components and theme classes in a browser-native dialog,
+      // mounted outside the card so scrollers and overlays cannot clip it.
+      const menu=document.createElement('dialog');
+      menu.className='dialog actionSheet actionsheet-not-fullscreen fe-settings-menu';
+      menu.setAttribute('aria-label','Franchises options');
+      menu.innerHTML='<div class="actionSheetContent"><div class="actionSheetScroller scrollY">'+
+        '<button is="emby-button" type="button" class="emby-button listItem listItem-button actionSheetMenuItem" autofocus>'+
+        '<span class="actionsheetMenuItemIcon listItemIcon listItemIcon-transparent material-icons settings" aria-hidden="true"></span>'+
+        '<div class="listItemBody actionsheetListItemBody"><div class="listItemBodyText actionSheetItemText">Franchise Explorer Settings</div></div>'+
+        '</button></div></div>';
+      const settings=menu.querySelector('button');
+      const close=()=>{
+        if(activeSettingsMenu?.menu!==menu)return;
+        activeSettingsMenu=null;
+        menu.close();menu.remove();
+        trigger.setAttribute('aria-expanded','false');
+        window.removeEventListener('resize',close);
+        window.removeEventListener('hashchange',close);
+        if(trigger.isConnected)trigger.focus({preventScroll:true});
+      };
+      activeSettingsMenu={controls,menu,close};
+      menu.addEventListener('cancel',event=>{event.preventDefault();close();});
+      menu.addEventListener('close',close);
+      menu.addEventListener('click',event=>{
+        if(event.target===menu){
+          const rect=menu.getBoundingClientRect();
+          if(event.clientX<rect.left||event.clientX>rect.right||event.clientY<rect.top||event.clientY>rect.bottom)close();
+        }
+      });
+      menu.addEventListener('keydown',event=>{
+        if(event.key==='ArrowUp'||event.key==='ArrowDown'){event.preventDefault();settings.focus();}
+      });
+      settings.addEventListener('click',()=>{close();window.location.assign(settingsUrl());});
+      document.body.append(menu);
+      menu.showModal();
+      trigger.setAttribute('aria-expanded','true');
+      const anchor=trigger.getBoundingClientRect();
+      const rect=menu.getBoundingClientRect();
+      menu.style.left=Math.max(10,Math.min(anchor.left+anchor.width/2-rect.width/2,window.innerWidth-rect.width-20))+'px';
+      menu.style.top=Math.max(10,Math.min(anchor.top+anchor.height/2-rect.height/2,window.innerHeight-rect.height-20))+'px';
+      window.addEventListener('resize',close);
+      window.addEventListener('hashchange',close);
     };
     trigger.addEventListener('click',event=>{
-      event.preventDefault();event.stopPropagation();setOpen(menu.hidden);
+      event.preventDefault();event.stopPropagation();openMenu();
     });
     trigger.addEventListener('keydown',event=>{
-      if(event.key==='Escape'){setOpen(false);trigger.focus();}
-      if(event.key==='ArrowUp'||event.key==='ArrowDown'){event.preventDefault();setOpen(true);settings.focus();}
-    });
-    openBrowse.addEventListener('click',event=>event.stopPropagation());
-    settings.addEventListener('click',event=>event.stopPropagation());
-    settings.addEventListener('keydown',event=>event.stopPropagation());
-    menu.addEventListener('keydown',event=>{
-      if(event.key==='Escape'){event.preventDefault();setOpen(false);trigger.focus();}
+      if(event.key==='ArrowUp'||event.key==='ArrowDown'){event.preventDefault();event.stopPropagation();openMenu();}
     });
     // Native Jellyfin delegates card activation on the container, so intercept
     // BEFORE the library's handler receives the cloned card click.
@@ -341,6 +365,7 @@
 
   function update() {
     queued = false;
+    if(activeSettingsMenu && !activeSettingsMenu.controls.isConnected)activeSettingsMenu.close();
     const container = findMyMediaContainer();
     if (!container) return;
     const ref = findCollectionsCard(container) || referenceCard(container);
@@ -386,7 +411,8 @@
   const observer = new MutationObserver(schedule);
   document.addEventListener('click',event=>{
     if(activeSettingsMenu &&
-       (!activeSettingsMenu.controls.isConnected || !activeSettingsMenu.controls.contains(event.target)))
+       (!activeSettingsMenu.controls.isConnected ||
+        (!activeSettingsMenu.controls.contains(event.target) && !activeSettingsMenu.menu.contains(event.target))))
       activeSettingsMenu.close();
   },true);
   const start = () => {
