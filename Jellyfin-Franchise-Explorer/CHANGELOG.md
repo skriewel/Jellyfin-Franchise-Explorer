@@ -1,4 +1,20 @@
-## 0.8.9.23 (unreleased)
+## 0.8.9.25 (unreleased)
+
+- Select one real library episode by season and episode while retaining full-show, season and episode-range selections.
+- Save named IMDb lists under Settings → Advanced settings and select reusable lists for a franchise, subgroup or row.
+- Choose episode bundles or individual chronological entries before reviewing Auto Add changes; retain the IMDb sequence and manual edits.
+- Persist row-only Auto Add mappings and retain deleted-row mappings so later imports respect row deletions.
+- Preserve chronological viewing progress when formatting changes reference IDs but leaves the playable sequence unchanged.
+
+## 0.8.9.24
+
+- Fix media reordering within rows in the settings editor and preserve the selected order through Save changes.
+- Enlarge touch media handles and keep the keyboard closed when opening the media popup on a phone; search still focuses when tapped.
+- Apply the franchise subtitle switch during Jellyfin playback negotiation, including native Android queue advances, and send actual subtitle stream selections when changing the setting during playback.
+- Restore settings switches when Jellyfin account IDs use another GUID format or the active session becomes ready after page initialization; support clicking the setting label and report preference-save failures.
+- Advance source, assembly, settings, catalog API, Injector and release-workflow markers to 0.8.9.24; retain the published 0.8.9.23 release and retire its plugin-owned Injector script after registration.
+
+## 0.8.9.23
 
 - Align project, assembly, settings, catalog API and Injector versions with the 0.8.9.23 release request; retire the previous plugin-owned Injector script after registration.
 

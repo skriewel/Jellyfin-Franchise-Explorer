@@ -31,6 +31,8 @@ Console.WriteLine("PASS IMDb parser, URL safety, XML migration and persistence")
 
 await ImdbTransportTests.Run();
 await ArtworkTests.Run();
+await PlaybackSubtitleTests.Run();
+ImdbListConfigurationTests.Run();
 
 if (args.Contains("--live"))
 {
