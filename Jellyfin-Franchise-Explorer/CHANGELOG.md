@@ -1,4 +1,11 @@
-## 0.8.9.25 (unreleased)
+## 0.8.9.26
+
+- Publish from the skriewel fork: catalog manifest, release downloads, README install URL and issue/build links point to `skriewel/Jellyfin-Franchise-Explorer`.
+- Show the Franchises tile only in the home screen's My Media row; never in search results, person pages or other card rows (also with localized headings).
+- Use Jellyfin's own styling, buttons and menu components for the franchise settings menu and align the franchise browser with Jellyfin library navigation.
+- Advance project, assembly, settings, catalog API, Injector and release-workflow markers to 0.8.9.26; retire the 0.8.9.25 and menu test-build Injector scripts after registration.
+
+## 0.8.9.25
 
 - Select one real library episode by season and episode while retaining full-show, season and episode-range selections.
 - Save named IMDb lists under Settings → Advanced settings and select reusable lists for a franchise, subgroup or row.

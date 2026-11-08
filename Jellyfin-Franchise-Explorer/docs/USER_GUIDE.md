@@ -36,7 +36,7 @@ The **Group type** label helps organize browsing; naming a group **Collection** 
 1. In **Jellyfin Dashboard → Plugins → Repositories**, add the Franchise Explorer catalog URL:
 
    ```text
-   https://raw.githubusercontent.com/Gost1o1/Jellyfin-Franchise-Explorer/main/manifest.json
+   https://raw.githubusercontent.com/skriewel/Jellyfin-Franchise-Explorer/main/manifest.json
    ```
 
 2. Add the JavaScript Injector catalog URL as a second repository:
