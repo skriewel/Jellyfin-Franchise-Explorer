@@ -80,10 +80,10 @@ Franchise Explorer has a standalone Franchises browser, but its **My Media tile,
 
 1. Open **Jellyfin Dashboard → Plugins → Repositories**.
 2. Select **Add** (or the **+** button).
-3. Give the first repository the name **Franchise Explorer (skriewel fork)** and paste this URL:
+3. Give the first repository the name **skriewel — Jellyfin plugins** and paste this URL (one catalog for all skriewel plugins, including Franchise Explorer):
 
 ```text
-https://raw.githubusercontent.com/skriewel/Jellyfin-Franchise-Explorer/main/manifest.json
+https://raw.githubusercontent.com/skriewel/jellyfin-plugins/main/manifest.json
 ```
 
 4. Save, select **Add** again, name the second repository **n00bcodr — JavaScript Injector**, and paste the repository URL from the [JavaScript Injector project's installation instructions](https://github.com/n00bcodr/Jellyfin-JavaScript-Injector#installation). The maintainer states the same catalog URL supports Jellyfin 10.11 and 12:

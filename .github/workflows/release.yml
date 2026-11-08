@@ -156,3 +156,13 @@ jobs:
           git add manifest.json
           git commit -m "catalog: publish experimental ${RELEASE_VERSION}"
           git push origin HEAD:main
+      - name: Ask the combined skriewel/jellyfin-plugins catalog to refresh
+        env:
+          CATALOG_TOKEN: ${{ secrets.CATALOG_DISPATCH_TOKEN }}
+        run: |
+          # The combined catalog also refreshes hourly; this only makes it immediate.
+          if [ -z "$CATALOG_TOKEN" ]; then
+            echo "No CATALOG_DISPATCH_TOKEN secret; the catalog picks up this release within the hour."
+            exit 0
+          fi
+          GH_TOKEN="$CATALOG_TOKEN" gh api repos/skriewel/jellyfin-plugins/dispatches -f event_type=plugin-released -f 'client_payload[repo]=${{ github.repository }}' || echo "::warning::Catalog refresh request failed; the hourly run will pick up the release."
