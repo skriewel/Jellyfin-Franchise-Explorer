@@ -37,7 +37,7 @@ assert 'Franchise Explorer Settings' in js
 assert 'openBrowse' not in js
 assert 'actionSheetMenuItem' in js
 assert 'console.warn(' in js and 'error?.message' in js
-assert 'https://raw.githubusercontent.com/skriewel/Jellyfin-Franchise-Explorer/main/manifest.json' in readme
+assert 'https://raw.githubusercontent.com/skriewel/jellyfin-plugins/main/manifest.json' in readme
 assert 'https://raw.githubusercontent.com/n00bcodr/jellyfin-plugins/main/manifest.json' in readme
 assert 'jellyfin-franchise-explorer-my-media-v08926' in readme
 assert 'docs/Gost1o1-logo.png' in readme

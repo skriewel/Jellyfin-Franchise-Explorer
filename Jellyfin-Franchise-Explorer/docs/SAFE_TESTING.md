@@ -6,7 +6,7 @@
 2. Set up a disposable Jellyfin 12.2 installation with its own data directory and dummy media.
 3. Before any test, back up Jellyfin's full data/configuration directories and verify restore works. A simple media-folder backup alone is not enough.
 4. Only after the release is published and the manifest contains a real entry, add this URL in Dashboard → Plugins → Repositories:
-   `https://raw.githubusercontent.com/skriewel/Jellyfin-Franchise-Explorer/main/manifest.json`
+   `https://raw.githubusercontent.com/skriewel/jellyfin-plugins/main/manifest.json`
 5. Install **Franchise Explorer**, restart the disposable instance and check its logs for assembly-load errors.
 6. Open Dashboard → Plugins → Franchise Explorer configuration page. Add a demo hierarchy, save, restart the test instance, and verify your groups persist.
 7. Export JSON, delete a virtual group, save, and confirm no original Jellyfin collection or file has changed.
