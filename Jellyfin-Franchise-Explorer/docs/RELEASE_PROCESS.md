@@ -9,6 +9,6 @@ The repository ZIP contains source code, not an installable Jellyfin DLL. It is 
 5. The workflow checks the project version, builds the plugin, packages the DLL, creates a GitHub prerelease targeting the validated commit, computes the ZIP checksum, and updates the manifest. Verify the release and manifest manually. Keep the published manifest unchanged while preparing source; the workflow updates it from the actual release ZIP.
 6. Use the existing catalog URL in Jellyfin and restart the service after updating. Validate your saved groups before importing collections.
 
-Catalog URL: `https://raw.githubusercontent.com/Gost1o1/Jellyfin-Franchise-Explorer/main/manifest.json`
+Catalog URL: `https://raw.githubusercontent.com/skriewel/Jellyfin-Franchise-Explorer/main/manifest.json`
 
 The release workflow requires permission to publish GitHub Releases and commit `manifest.json` (`contents: write`). Never advertise a release before compilation succeeds. Prefer an isolated Jellyfin instance for runtime compatibility testing; without one, installing on the main service carries risk.

@@ -4,7 +4,7 @@
     "name": "Franchise Explorer",
     "overview": "Experimental virtual franchise browsing for Jellyfin 12.2 (use caution).",
     "description": "Unfinished experimental plugin: virtual hierarchies and read-only responsive Franchises browser; no native My Media tile or media manipulation.",
-    "owner": "Gost1o1",
+    "owner": "skriewel",
     "category": "General",
     "versions": [
       {
