@@ -93,6 +93,7 @@ jobs:
           python3 scripts/test_autonext_browser.py
           python3 scripts/test_home_recovery_browser.py
           python3 scripts/test_my_media_tile_browser.py
+          python3 scripts/test_my_media_tile_scope_browser.py
           python3 scripts/test_my_media_tile_resize.py
           python3 scripts/test_v085_native_card.py
           python3 scripts/test_v085_card_progress.py

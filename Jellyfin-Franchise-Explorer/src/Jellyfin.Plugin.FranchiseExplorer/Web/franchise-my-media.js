@@ -135,8 +135,30 @@
     return content?.querySelector('.card, .libraryCard, .homeLibraryTile') ? content : null;
   }
 
+  // The tile belongs to Jellyfin's home screen only. Search results, person
+  // pages and library views also render rows of cards; the structural
+  // fallbacks below must never treat those rows as My Media.
+  function isHomeRoute() {
+    const hash = location.hash || '';
+    return !hash || /^#!?\/?(?:home(?:\.html)?)?(?:\?|$)/i.test(hash);
+  }
+
+  function homeRoot() {
+    if (!isHomeRoute()) return null;
+    const pages = [...document.querySelectorAll('#indexPage, .homePage')];
+    if (pages.length) {
+      const page = pages.find(candidate => !candidate.classList.contains('hide'));
+      if (!page) return null;
+      return page.querySelector('#homeTab, .homeTab') || page;
+    }
+    return document.querySelector('#homeTab:not(.hide), .homeTab:not(.hide)') ||
+      document.querySelector('#homeTab, .homeTab') || document;
+  }
+
   function findMyMediaContainer() {
-    const headings = document.querySelectorAll('h1,h2,h3,h4,.sectionTitle');
+    const root = homeRoot();
+    if (!root) return null;
+    const headings = root.querySelectorAll('h1,h2,h3,h4,.sectionTitle');
     for (const heading of headings) {
       if (!isMyMediaHeading(heading)) continue;
       let section = heading.closest('.verticalSection, .homeSection, section, [data-section]');
@@ -151,7 +173,6 @@
     // DOM structure. Prefer explicit library markers; as a final fallback use
     // the FIRST home row (Jellyfin renders My Media before playback shelves).
     // Never fall through to a subsequent Continue Watching / Next Up row.
-    const root = document.querySelector('.homeTab:not(.hide)') || document.querySelector('.homeTab') || document;
     const known = root.querySelector('#home-my-media, [data-section="myMedia"], [data-section="my-media"], .homeLibrarySection, .homeLibraries');
     if (cardsContainer(known)) return cardsContainer(known);
     const sections = [...root.querySelectorAll('.verticalSection, .homeSection, section')]
@@ -374,7 +395,16 @@
     queued = false;
     if(activeSettingsMenu && !activeSettingsMenu.controls.isConnected)activeSettingsMenu.close();
     const container = findMyMediaContainer();
-    if (!container) return;
+    if (!container) {
+      // Drop a tile that an earlier version (or a stale page) placed outside
+      // the home screen, e.g. in search results or on a person's page.
+      const stray = document.getElementById(TILE_ID);
+      if (stray && !stray.closest('#indexPage, .homePage, #homeTab, .homeTab')) {
+        if (activeSettingsMenu?.controls && stray.contains(activeSettingsMenu.controls)) activeSettingsMenu.close();
+        stray.remove();
+      }
+      return;
+    }
     const ref = findCollectionsCard(container) || referenceCard(container);
     if (!ref) return;
     ensureStyle();
