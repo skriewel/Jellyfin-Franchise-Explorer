@@ -11,7 +11,12 @@ readme = (root.parent / "README.md").read_text(encoding="utf-8")
 
 for field in ("Version", "AssemblyVersion", "FileVersion"):
     assert f"<{field}>0.8.9.25</{field}>" in version, field
-assert 'CurrentScriptId = "jellyfin-franchise-explorer-my-media-v08925"' in cs
+assert 'CurrentScriptId = "jellyfin-franchise-explorer-my-media-v08925-menu3"' in cs
+assert '"jellyfin-franchise-explorer-my-media-v08925",' in cs
+assert '"jellyfin-franchise-explorer-my-media-v08923-menu3",' in cs
+assert '"jellyfin-franchise-explorer-my-media-v08923",' in cs
+assert 'Franchise Explorer test build menu3 loaded' in cs
+assert js.index('if (window.__franchiseExplorerMyMediaTileLoaded) return;') < js.index("window.__franchiseExplorerUiBuild = 'menu3'")
 assert '"jellyfin-franchise-explorer-my-media-v08914"' in cs
 assert '"jellyfin-franchise-explorer-my-media-v08913"' in cs
 assert '"jellyfin-franchise-explorer-my-media-v0899"' in cs
@@ -28,7 +33,8 @@ assert "CACHE_PREFIX = 'fe-franchise-home-v08925:'" in js
 assert 'confirmedEmpty = active.length === 0' in js
 assert 'Loading your franchise watch orders' in js
 assert 'Franchise Explorer Settings' in js
-assert 'Open Franchises' in js
+assert 'openBrowse' not in js
+assert 'actionSheetMenuItem' in js
 assert 'console.warn(' in js and 'error?.message' in js
 assert 'https://raw.githubusercontent.com/Gost1o1/Jellyfin-Franchise-Explorer/main/manifest.json' in readme
 assert 'https://raw.githubusercontent.com/n00bcodr/jellyfin-plugins/main/manifest.json' in readme

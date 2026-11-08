@@ -169,11 +169,36 @@ h1{font-size:clamp(1.65rem,3.6vw,3.6rem);line-height:1.13;margin:9px 0 8px;lette
 .shelf-poster{width:38px;height:56px;object-fit:cover;flex:none;border-radius:5px;border:1px solid #536776}
 @media(max-width:650px){.shelf.has-custom-art{padding:10px}.shelf-poster{width:30px;height:44px}}
 </style>
+<style>
+/* Library chrome: keep the standalone browser aligned with Jellyfin Web. */
+:root{--bg:#101010;--surface:#202020;--line:#ffffff26;--text:#eee;--muted:#aaa;--accent:#00a4dc;--radius:4px;font-family:Roboto,"Segoe UI",Arial,sans-serif}
+.top{min-height:64px;padding:8px 3%;gap:12px;background:#101010ed;border:0;flex-wrap:wrap}
+.brand{min-height:44px;padding:0;margin:0;border-radius:4px;gap:8px}
+.brand-mark{display:none}.brand-title{font-weight:500;letter-spacing:0;font-size:1.1rem}
+.actions{gap:4px;flex-wrap:nowrap}.top .btn{border:0;background:transparent;border-radius:50%;width:44px;height:44px;padding:10px;font-size:22px;display:grid;place-items:center}
+.top .btn:hover{background:#ffffff20}.top .desktop-word{display:none}
+.library-nav{display:flex;align-items:center;gap:4px;flex:1;min-width:0;overflow-x:auto;scrollbar-width:thin}
+.library-nav a{white-space:nowrap;padding:12px 10px;font-size:.95rem;border-radius:3px}
+.library-nav a:hover{background:#ffffff16}.library-nav a[aria-current]{color:var(--accent)}
+main{width:100%;max-width:none;padding:8px 3% 32px}
+.tools{margin:8px 0 16px;gap:12px}.tools h2{font-size:1.5rem;font-weight:400;margin:0 12px 0 0}
+.field{border:0;border-bottom:1px solid #ffffff65;border-radius:0;background:#ffffff0b;padding:9px 12px;min-height:42px}
+.search{width:clamp(160px,20vw,300px)}.btn,.shelf-arrow{border:0;border-radius:3px;background:#ffffff14;font-weight:400;min-height:42px}
+.btn:hover,.shelf-arrow:hover{background:#ffffff26}.btn-primary{background:var(--accent);color:#fff}
+.gallery{grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:20px}
+.cover,.tile{border-radius:4px}.cover{border:0}.tile strong{font-weight:400}.cover .tag{background:var(--accent);color:#fff}
+.hero{border:0;border-radius:4px}.crumbs{margin:0 0 8px}.crumbs button{font-weight:400}
+.status:empty{display:none}.library-count{font-size:.85rem;border-radius:20px;background:#ffffff20;padding:7px 12px;color:var(--muted)}
+@media(min-width:1800px){.gallery{grid-template-columns:repeat(auto-fill,minmax(180px,1fr))}}
+@media(max-width:760px){.library-nav{order:3;flex-basis:100%}.top{gap:4px;justify-content:space-between}.tools-left{width:auto}.search{width:min(260px,100%)}.gallery{grid-template-columns:repeat(auto-fill,minmax(125px,1fr));gap:14px}}
+@media(max-width:420px){.gallery{grid-template-columns:repeat(2,minmax(0,1fr))}.tools-left:first-child{width:100%}.search{width:100%}.brand-title{max-width:none}}
+</style>
 </head>
 <body>
 <header class="top">
   <a id="brand-home" class="brand" href="/FranchiseExplorer/Browse" title="Return to Your franchises" aria-label="Franchise Explorer — return to Your franchises"><span class="brand-mark" aria-hidden="true">F</span><span id="brand-title" class="brand-title">Franchise Explorer</span></a>
-  <nav class="actions" aria-label="Navigation"><a id="fe-config-settings" class="btn btn-lite" href="#" title="Franchise Explorer Settings (Jellyfin administrator required)" aria-label="Franchise Explorer Settings">⚙ <span class="desktop-word">Settings</span></a><a id="return-jellyfin" class="btn btn-lite" href="#">← <span class="desktop-word">Jellyfin</span></a><button class="btn btn-lite" id="browse-back" title="Back to parent" type="button">↑ <span class="desktop-word">Back</span></button></nav>
+  <nav id="library-nav" class="library-nav" aria-label="Libraries"></nav>
+  <nav class="actions" aria-label="Navigation"><button class="btn btn-lite" id="browse-back" title="Back to parent" aria-label="Back to parent" type="button">←</button><a id="return-jellyfin" class="btn btn-lite" href="#" title="Jellyfin Home" aria-label="Jellyfin Home">⌂</a><a id="fe-config-settings" class="btn btn-lite hidden" href="#" title="Franchise Explorer Settings" aria-label="Franchise Explorer Settings">⚙</a></nav>
 </header>
 <main>
   <nav id="breadcrumbs" class="crumbs" aria-label="Breadcrumbs"></nav>
@@ -190,6 +215,13 @@ h1{font-size:clamp(1.65rem,3.6vw,3.6rem);line-height:1.13;margin:9px 0 8px;lette
 'use strict';
 (() => {
   const $ = id => document.getElementById(id);
+  // Inline Material-style icons work without fetching a font from a CDN.
+  const iconPaths={
+    'browse-back':'M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.42-1.41L7.83 13H20v-2z',
+    'return-jellyfin':'M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z',
+    'fe-config-settings':'M19.43 12.98c.04-.32.07-.65.07-.98s-.03-.66-.08-.98l2.11-1.65-2-3.46-2.49 1a7.5 7.5 0 0 0-1.69-.98L15 3h-4l-.35 2.93c-.61.25-1.17.58-1.69.98l-2.49-1-2 3.46 2.11 1.65a7.8 7.8 0 0 0 0 1.96l-2.11 1.65 2 3.46 2.49-1c.52.4 1.08.73 1.69.98L11 21h4l.35-2.93c.61-.25 1.17-.58 1.69-.98l2.49 1 2-3.46zM13 15.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z'
+  };
+  for(const [id,path] of Object.entries(iconPaths))$(id).innerHTML='<svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor" aria-hidden="true"><path d="'+path+'"/></svg>';
   const prefix = location.pathname.split('/FranchiseExplorer/')[0].replace(/\/$/,'');
   const serverPath = path => prefix + (path.startsWith('/') ? path : '/' + path);
   $('return-jellyfin').href = serverPath('/web/index.html');
@@ -221,6 +253,23 @@ h1{font-size:clamp(1.65rem,3.6vw,3.6rem);line-height:1.13;margin:9px 0 8px;lette
     }
   };
   const authHeaders = () => ({Authorization:'MediaBrowser Token="'+token+'"'});
+  async function loadLibraryNavigation(){
+    const nav=$('library-nav');
+    const add=(name,route,active=false)=>{const link=document.createElement('a');link.textContent=name;link.href=route;if(active)link.setAttribute('aria-current','page');nav.append(link);};
+    add('Jellyfin',serverPath('/web/index.html#/home'));
+    try{
+      const result=await api('/Users/'+encodeURIComponent(userId)+'/Views');
+      const routes={movies:'movies',tvshows:'tv',music:'music',musicvideos:'musicvideos',homevideos:'homevideos',books:'books',boxsets:'boxsets',playlists:'playlists'};
+      for(const item of result.Items||[]){
+        if(!safeGuid(item.Id))continue;
+        const type=item.CollectionType||'mixed';
+        const route=routes[type]||'mixed';
+        add(item.Name||type,serverPath('/web/index.html#/'+route+'?topParentId='+encodeURIComponent(item.Id)+'&collectionType='+encodeURIComponent(type)));
+      }
+    }catch(_){/* Navigation must remain usable when Views is unavailable. */}
+    add('Franchises',serverPath('/FranchiseExplorer/Browse'),true);
+    try{const user=await api('/Users/'+encodeURIComponent(userId));$('fe-config-settings').classList.toggle('hidden',!user.Policy?.IsAdministrator);}catch(_){/* Settings are administrator-only. */}
+  }
   function serverMatch(s){return ['ManualAddress','LocalAddress','RemoteAddress','LastConnectionAddress'].some(k=>{
     try{return s[k] && new URL(s[k]).origin === location.origin;}catch(_){return false;}
   });}
@@ -610,7 +659,7 @@ h1{font-size:clamp(1.65rem,3.6vw,3.6rem);line-height:1.13;margin:9px 0 8px;lette
     // Keep the rich artwork hero for a selected franchise only.
     document.querySelector('.hero').classList.toggle('hidden',!selected);
     $('breadcrumbs').classList.toggle('hidden',!selected);
-    $('browse-back').disabled=!selected;$('browse-back').onclick=()=>openGroup(selected?selected.parentId:'');
+    $('browse-back').disabled=false;$('browse-back').onclick=()=>{if(selected)openGroup(selected.parentId);else location.assign(serverPath('/web/index.html#/home'));};
     text($('hero-type'),selected?selected.nodeType:'Virtual library');text($('hero-title'),title);
     text($('hero-description'),selected?(selected.overview||'Browse the subgroups, movies, and TV shows linked to this virtual franchise.'):'Browse your franchise groups, eras, phases, and viewing references.');
     if(selected){const counts=mediaCounts(selected.id);text($('hero-count'),'TV Shows '+counts.tvShows+' · Movies '+counts.movies);}
@@ -625,7 +674,7 @@ h1{font-size:clamp(1.65rem,3.6vw,3.6rem);line-height:1.13;margin:9px 0 8px;lette
     const filter=$('search').value.trim().toLocaleLowerCase();
     $('rows-container').replaceChildren();$('group-grid').replaceChildren();$('media-grid').replaceChildren();
     $('group-grid').classList.toggle('listview',view==='list');$('media-grid').classList.toggle('listview',view==='list');
-    text($('items-heading'),selected?'Browse '+selected.name:'Your franchises');
+    text($('items-heading'),selected?selected.name:(catalog.title||'Franchises'));
     $('groups-section').classList.add('hidden');$('media-section').classList.add('hidden');
     status('');let shown=0;
     if(selected){
@@ -681,6 +730,7 @@ h1{font-size:clamp(1.65rem,3.6vw,3.6rem);line-height:1.13;margin:9px 0 8px;lette
   async function init(){
     $('sort').value='custom';
     if(!(await session())){status('Sign in to Jellyfin Web on this device first, then return to Franchises.',true);$('empty').classList.remove('hidden');text($('empty'),'No Jellyfin Web login session was found for this server.');return;}
+    void loadLibraryNavigation();
     try{
       catalog=await api('/FranchiseExplorer/Catalog');
       if(!Array.isArray(catalog.nodes)||!Array.isArray(catalog.links))throw new Error('Unexpected catalog format.');

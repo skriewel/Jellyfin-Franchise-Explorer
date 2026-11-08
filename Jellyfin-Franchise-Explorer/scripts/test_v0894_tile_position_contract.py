@@ -17,7 +17,7 @@ assert "window.getComputedStyle(controlsHost).position === 'static'" in script
 assert script.index("syncNativeInlineStyles(tile, ref);") < script.index("window.getComputedStyle(controlsHost).position === 'static'")
 assert "if (!imageHost) controlsHost.style.pointerEvents = 'auto'" in script
 assert "bottom:3px" in script and "right:6px" in script
-assert "background:transparent;color:white" in script
+assert "paper-icon-button-light cardOverlayButton" in script
 assert "opacity:0;pointer-events:none;transition:opacity" in script
 assert ":hover .fe-settings-toggle" in script
 assert ":focus-within .fe-settings-toggle" in script
@@ -35,7 +35,7 @@ assert "card.classList.toggle(NATIVE_HIDE_CLASS" in script
 assert "const image=tile.querySelector(" in browser
 assert "holder.parentElement===image" in browser
 assert "menu_geometry['bottomGap']" in browser
-assert 'CurrentScriptId = "jellyfin-franchise-explorer-my-media-v08925"' in service
+assert 'CurrentScriptId = "jellyfin-franchise-explorer-my-media-v08925-menu3"' in service
 assert '"jellyfin-franchise-explorer-my-media-v0894"' in service
 assert '"jellyfin-franchise-explorer-my-media-v0893"' in service
 assert '"jellyfin-franchise-explorer-my-media-v1"' in service

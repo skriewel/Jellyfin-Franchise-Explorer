@@ -20,6 +20,8 @@ Object.defineProperty(window,'localStorage',{{configurable:true,value:{{getItem:
 window.fetch=async function(input){{
   const path=String(input).split('?')[0];
   if(path.endsWith('/System/Info/Public'))return new Response(JSON.stringify({{Id:'testserver'}}),{{status:200,headers:{{'Content-Type':'application/json'}}}});
+  if(path.endsWith('/Views'))return new Response(JSON.stringify({{Items:[{{Id:'{collection}',Name:'Sammlungen',CollectionType:'boxsets'}}]}}),{{status:200}});
+  if(path.endsWith('/Users/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'))return new Response(JSON.stringify({{Policy:{{IsAdministrator:true}}}}),{{status:200}});
   if(path.endsWith('/FranchiseExplorer/Catalog'))return new Response(JSON.stringify({json.dumps(catalog)}),{{status:200,headers:{{'Content-Type':'application/json'}}}});
   const item={json.dumps(items)}[path.split('/').pop()];
   if(path.includes('/Items/')&&item)return new Response(JSON.stringify(item),{{status:200,headers:{{'Content-Type':'application/json'}}}});
@@ -34,6 +36,10 @@ with sync_playwright() as p:
    page=browser.new_page(viewport={'width':width,'height':height})
    page.set_content(HTML)
    page.get_by_role('button',name='Marvel Cinematic Universe').wait_for(timeout=5000)
+   page.locator('#library-nav a[aria-current="page"]').wait_for()
+   assert '#/boxsets?topParentId='+collection in page.get_by_role('link',name='Sammlungen').get_attribute('href')
+   assert page.locator('#fe-config-settings').is_visible()
+   assert page.locator('#browse-back').is_enabled()
    page.get_by_role('button',name='Marvel Cinematic Universe').click()
    page.get_by_role('button',name='Phase Four').wait_for(timeout=5000)
    page.get_by_role('button',name='Phase Four').click()

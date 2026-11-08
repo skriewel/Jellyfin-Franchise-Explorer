@@ -185,12 +185,19 @@ with sync_playwright() as p:
             getComputedStyle(holder).pointerEvents==='auto';
         }""")
         tile.locator(".fe-settings-toggle").click()
-        assert tile.locator(".fe-settings-menu").is_visible()
+        menu = page.locator("dialog.fe-settings-menu")
+        assert menu.is_visible()
         assert page.url == before_menu, "Clicking the three dots must not open browsing"
-        assert "Open Franchises" in tile.locator(".fe-settings-menu").inner_text()
-        assert "configurationpage?name=Franchise%20Explorer" in tile.locator(".fe-settings-link").last.get_attribute("href")
-        page.locator("#next").click()
-        assert not tile.locator(".fe-settings-menu").is_visible()
+        assert menu.locator('button[is="emby-button"]').count() == 1
+        assert menu.inner_text().strip() == "Franchise Explorer Settings"
+        assert menu.locator('button').evaluate('(el) => el === document.activeElement')
+        page.keyboard.press('Escape')
+        assert menu.count() == 0
+        assert tile.locator('.fe-settings-toggle').evaluate('(el) => el === document.activeElement')
+        page.keyboard.press('ArrowDown')
+        assert menu.is_visible()
+        page.mouse.click(1, 1)
+        assert menu.count() == 0
 
         preference_key = f"fe-show-active-native-rows:{ORIGIN}:{USER.lower()}"
         page.evaluate("([key]) => {localStorage.setItem(key,'0'); window.dispatchEvent(new Event('pageshow'));}", [preference_key])
@@ -238,6 +245,9 @@ with sync_playwright() as p:
         # cards in a horizontally scrolling row. Its scrollWidth can exceed the
         # viewport at 390 px even with the plugin disabled. Test the franchise
         # section itself instead of incorrectly rejecting that native carousel.
+        # Hovering its offscreen tile scrolls this mock document horizontally;
+        # reload preserves that offset. Measure layout at the document origin.
+        page.evaluate('window.scrollTo(0, 0)')
         layout = page.evaluate("""() => {
           const section = document.querySelector('#franchise-timeline-resume');
           const grid = section?.querySelector('.fe-resume-grid');
@@ -257,6 +267,11 @@ with sync_playwright() as p:
         assert all(card["left"] >= layout["grid"]["left"] - 1 and
                    card["right"] <= layout["grid"]["right"] + 1
                    for card in layout["cards"]), layout
+        tile.hover()
+        tile.locator('.fe-settings-toggle').click()
+        page.locator('dialog.fe-settings-menu button').click()
+        page.wait_for_url('**/web/index.html#/configurationpage?name=Franchise%20Explorer')
+        assert page.locator('dialog.fe-settings-menu').count() == 0
         print("PASS v0.8.9.2 homepage / menu / hard refresh at", width, "px")
         page.close()
     browser.close()

@@ -31,6 +31,17 @@ with sync_playwright() as p:
     for width in [390, 620, 900, 1440, 1920]:
         page = browser.new_page(viewport={'width':width, 'height':900})
         page.set_content(HTML)
+        # Match the createElement signature of Jellyfin's webcomponents.js
+        # 0.7.24. Modern options objects must not break tile construction.
+        page.evaluate('''() => {
+          const create = document.createElement.bind(document);
+          document.createElement = function(tag, extension) {
+            if (extension) extension = extension.toLowerCase();
+            const element = create(tag);
+            if (extension) element.setAttribute('is', extension);
+            return element;
+          };
+        }''')
         page.add_script_tag(content=JS)
         page.wait_for_selector('#franchise-explorer-my-media-tile',timeout=5000)
         assert page.locator('#franchise-explorer-my-media-tile').count() == 1
