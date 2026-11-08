@@ -4,19 +4,36 @@ This branch integrates the approved settings UI into the actual Jellyfin plugin.
 
 ## Editing
 
-- **Settings** contains subtitle preferences and the Home row visibility switch. **Advanced settings**, inside Settings, contains backup import/export. These viewer preferences apply immediately in the current browser, as in the existing plugin.
+- **Settings** contains subtitle preferences and the Home row visibility switch. **Advanced settings**, inside Settings, contains backup import/export and reusable IMDb lists. Viewer preferences are saved per user and server in the current browser; IMDb lists belong to the plugin configuration and its backups.
 - **Franchises** starts closed. Add a franchise, or expand an existing franchise to see its rows and subgroups. Settings, plus and delete buttons stay beside each title on mobile.
 - A franchise or subgroup's **settings** button opens its title, description, poster, backdrop and IMDb sources. Groups and subgroups can be added here, including inside an existing subgroup.
 - A row's **settings** button opens its category and artwork. The category supplies the name; **Custom** reveals a name field. **Sub Group** creates a named subgroup. Converting an existing row keeps that row and its references inside the new subgroup.
 - The **plus** button opens **Add/Modify/Delete Media**. This is the only library search surface. It also includes **Add group / row** and **Add subgroup** for the indicated owner.
-- Movies search movies, TV Shows search series, and Collection searches collections. Chronological Order searches movies and series. Custom searches all three types. TV references can use a full show, seasons or an episode range.
+- Movies search movies, TV Shows search series, and Collection searches collections. Chronological Order searches movies and series. Custom searches all three types. TV references can use a full show, seasons, an episode range or a specific episode chosen from the real library's season and episode lists.
 - Drag handles reorder franchises horizontally and rows/subgroups vertically. Drop onto a group's insertion target to nest an entry. Enter or Space on a drag handle opens the equivalent placement dialog.
+- Expand a media row to drag its movies, shows, episode ranges or collections up and down. The same handles are available under **Current media** in the plus popup. Each row keeps its own order, including rows inside subgroups. On a media handle, use **Alt+Up/Down** for a single step or **Enter/Space** to choose a position. Use **Save changes** to persist the order; Undo restores the prior arrangement. Reordering keeps media references, ranges, artwork and viewing progress intact.
+
+Media dragging changes the order inside the same row. On touch screens, use the six-dot handle beside the media title. Opening the plus popup leaves the phone keyboard closed; tap **Search titles** to type.
+
+## Subtitle playback
+
+The subtitle switch applies when launching franchise playback and can update a currently playing franchise item. Off requests Jellyfin subtitle index `-1`, including forced, external and ASS subtitle streams. On chooses an available stream in the selected language, with the Jellyfin user's subtitle language as the default when no language is selected. Existing subtitles already burned into a source video cannot be removed.
+
+The server records a temporary preference for the explicit item queue, signed-in user and selected playback device. This supports native queue advances while the web page is paused. It does not rewrite the Jellyfin user's settings. Each new franchise launch replaces the device's queue scope; it expires after twelve hours or a server restart. Replaying an enrolled item on that device during the scope can retain this preference. Unrelated items receive no override, and their metadata requests do not clear the active queue.
+
+If the server cannot confirm the preference, the launch shows an error instead of starting with an unconfirmed setting. A change during playback uses Jellyfin's subtitle command for that user's active device. Android 2.7.3 Integrated Player does not implement that live subtitle command; use the preference before launching or restarting playback. Its later queue entries also receive the saved choice during playback negotiation.
 
 Edits remain in the page until **Save changes**. Saving an individual settings dialog stages that edit; Cancel discards that dialog's pending edits. **Undo** restores prior staged edits. **Reload saved settings** reads the server configuration and keeps the prior draft available through Undo. A concurrent configuration change on the server blocks saving until the editor is reloaded.
 
 Deleting a subgroup confirms that its owned rows, descendants and references will be removed. Removing a reference never deletes a Jellyfin media item. Legacy rows can share node-owned references: deleting such a row removes its membership while retaining references still used elsewhere. Moving shared memberships across incompatible owners is blocked instead of silently dropping them.
 
 ## IMDb review
+
+Under **Settings → Advanced settings → IMDb lists**, save named IMDb URLs, edit them, enable or disable them, or remove them from the reusable library. These changes participate in Undo, backup export/import and **Save changes**. Saving a list does not import its titles. Assigning a saved list creates an independent source for the selected franchise, subgroup or row; deleting a reusable list does not remove an already assigned source or any media.
+
+Chronological Auto Add supports **Episode bundles** (the existing default) and **Individual episodes**. Individual mode keeps separate entries such as `S01E01`, `S01E02`, `S01E03` in IMDb order, including any movies between episodes. Bundles combine only verified consecutive entries and split at gaps or intervening titles. The TV Shows presentation row continues to use one full-show card.
+
+Existing Auto-Add entries that need a formatting change appear in the review before replacement. Manual references and edited imports stay protected. A chronological row can override its franchise's episode format. When only reference formatting changes and the playable sequence remains identical, the timeline retains its current position and completed history.
 
 Open a franchise or subgroup's settings, choose **Auto Add from IMDb**, enter a public list URL, and choose **Preview changes**. The review shows title, media type, destination and proposed change. Additions and safe removals start selected; missing titles are shown separately. Episode choices expand within a show, and verified adjacent episodes use a single range such as `S01E01–S01E03`.
 
